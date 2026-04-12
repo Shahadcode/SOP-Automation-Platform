@@ -1,8 +1,10 @@
 import json
 from openai import OpenAI
 
-client = OpenAI(api_key="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")  
+import os
+from openai import OpenAI
 
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 def generate_sop_data(text, department, language="Arabic"):
     prompt = f"""
 أنت خبير محترف في إعداد الإجراءات التشغيلية القياسية في البنوك.
