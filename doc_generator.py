@@ -1,5 +1,8 @@
-from docx import Document
+import os
 from datetime import datetime
+from docx import Document
+from docx.text.paragraph import Paragraph
+from docx.oxml import OxmlElement
 
 
 def replace_text_in_paragraphs(doc, replacements):
@@ -13,9 +16,10 @@ def replace_text_in_tables(doc, replacements):
     for table in doc.tables:
         for row in table.rows:
             for cell in row.cells:
-                for key, value in replacements.items():
-                    if key in cell.text:
-                        cell.text = cell.text.replace(key, value)
+                for paragraph in cell.paragraphs:
+                    for key, value in replacements.items():
+                        if key in paragraph.text:
+                            paragraph.text = paragraph.text.replace(key, value)
 
 
 def replace_placeholder_with_lines(doc, placeholder, items):
@@ -50,9 +54,6 @@ def replace_placeholder_with_lines(doc, placeholder, items):
 
 
 def add_insert_paragraph_after():
-    from docx.text.paragraph import Paragraph
-    from docx.oxml import OxmlElement
-
     def insert_paragraph_after(self, text=None, style=None):
         new_p = OxmlElement("w:p")
         self._p.addnext(new_p)
@@ -71,6 +72,9 @@ def create_sop_doc_from_template(data):
 
     template_path = "templates/arabic_sop_template_placeholders.docx"
     doc = Document(template_path)
+
+    # Create outputs folder automatically on Streamlit Cloud
+    os.makedirs("outputs", exist_ok=True)
 
     replacements = {
         "[عنوان الإجراء]": data.get("title", ""),
