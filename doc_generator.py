@@ -22,10 +22,31 @@ def replace_text_in_tables(doc, replacements):
                             paragraph.text = paragraph.text.replace(key, value)
 
 
+def normalize_items(items):
+    if items is None:
+        return [""]
+
+    if isinstance(items, str):
+        text = items.strip()
+        if not text:
+            return [""]
+        return [line.strip("•- \n\r\t") for line in text.splitlines() if line.strip()]
+
+    if isinstance(items, list):
+        cleaned = []
+        for item in items:
+            if item is None:
+                continue
+            item_str = str(item).strip()
+            if item_str:
+                cleaned.append(item_str)
+        return cleaned if cleaned else [""]
+
+    return [str(items).strip()] if str(items).strip() else [""]
+
+
 def replace_placeholder_with_lines(doc, placeholder, items):
-    clean_items = [str(item).strip() for item in items if str(item).strip()]
-    if not clean_items:
-        clean_items = [""]
+    clean_items = normalize_items(items)
 
     for p in doc.paragraphs:
         if placeholder in p.text:
@@ -73,7 +94,6 @@ def create_sop_doc_from_template(data):
     template_path = "templates/arabic_sop_template_placeholders.docx"
     doc = Document(template_path)
 
-    # Create outputs folder automatically on Streamlit Cloud
     os.makedirs("outputs", exist_ok=True)
 
     replacements = {
