@@ -109,7 +109,18 @@ section[data-testid="stSidebar"] {
     text-align: right;
 }
 
-/* Force right alignment everywhere useful */
+.mode-note {
+    background-color: #ffffff;
+    color: #134e4a;
+    border: 1px solid #b7d7ce;
+    padding: 10px 12px;
+    border-radius: 12px;
+    margin-top: 10px;
+    text-align: right;
+    font-size: 13px;
+}
+
+/* Force right alignment */
 [data-testid="column"] {
     text-align: right !important;
 }
@@ -161,6 +172,12 @@ div[data-baseweb="select"] svg {
     color: #0f766e !important;
 }
 
+/* Radio */
+div[role="radiogroup"] {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
 /* Buttons */
 .stButton > button {
     width: 100%;
@@ -175,6 +192,24 @@ div[data-baseweb="select"] svg {
 
 .stButton > button:hover {
     background-color: #115e59;
+    color: white;
+}
+
+/* Download button */
+.stDownloadButton > button {
+    width: 100%;
+    background-color: #134e4a;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    height: 48px;
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+.stDownloadButton > button:hover {
+    background-color: #0f3f3c;
     color: white;
 }
 
@@ -241,6 +276,23 @@ if page == "إنشاء الإجراء":
             ["العربية"]
         )
 
+        mode = st.radio(
+            "وضع العمل",
+            ["استخراج مباشر من النص", "إعادة صياغة احترافية"],
+            index=0
+        )
+
+        if mode == "استخراج مباشر من النص":
+            st.markdown(
+                '<div class="mode-note">سيتم الاعتماد على نص المستند المرفوع كما هو قدر الإمكان، مع أقل قدر ممكن من الاختصار أو إعادة الصياغة.</div>',
+                unsafe_allow_html=True
+            )
+        else:
+            st.markdown(
+                '<div class="mode-note">سيتم تنظيم المحتوى وصياغته بشكل أكثر مهنية مع الحفاظ على المعنى الأساسي للنص المرفوع.</div>',
+                unsafe_allow_html=True
+            )
+
         generate_btn = st.button("إنشاء الإجراء")
 
     with left:
@@ -268,7 +320,15 @@ if page == "إنشاء الإجراء":
         if text:
             with st.spinner("جاري إنشاء الإجراء..."):
                 try:
-                    sop_data = generate_sop_data(text, department, language)
+                    engine_mode = "strict" if mode == "استخراج مباشر من النص" else "enhanced"
+
+                    sop_data = generate_sop_data(
+                        text=text,
+                        department=department,
+                        language=language,
+                        mode=engine_mode
+                    )
+
                     file_path = create_sop_doc_from_template(sop_data)
 
                     st.success("تم إنشاء ملف الإجراء بنجاح.")
@@ -304,7 +364,8 @@ elif page == "معلومات النظام":
         st.markdown('<div class="plain-section-title">كيفية الاستخدام</div>', unsafe_allow_html=True)
         st.write("1. قم برفع ملف الإجراء.")
         st.write("2. اختر القسم.")
-        st.write("3. اضغط على زر إنشاء الإجراء.")
-        st.write("4. قم بتحميل ملف الـ SOP الجاهز.")
+        st.write("3. اختر وضع العمل المناسب.")
+        st.write("4. اضغط على زر إنشاء الإجراء.")
+        st.write("5. قم بتحميل ملف الـ SOP الجاهز.")
 
 st.markdown('<div class="footer-note">Internal Use Only - SOP Automation Platform</div>', unsafe_allow_html=True)
