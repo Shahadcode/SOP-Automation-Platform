@@ -13,57 +13,37 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* ===== Base ===== */
-html, body {
-    direction: rtl;
-}
-
+/* ===== SAFE BASE ONLY ===== */
 .stApp {
     background-color: #EAF5F2;
 }
 
 .block-container {
-    padding-top: 0.8rem !important;
+    padding-top: 1rem !important;
     padding-bottom: 1rem !important;
     padding-left: 2rem !important;
     padding-right: 2rem !important;
     max-width: 100% !important;
 }
 
-/* ===== Hide only safe Streamlit chrome ===== */
-#MainMenu {
-    visibility: hidden;
-}
+/* Hide only safe Streamlit chrome */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header[data-testid="stHeader"] {background: transparent !important;}
+[data-testid="stToolbar"] {display: none !important;}
 
-footer {
-    visibility: hidden;
-}
-
-header[data-testid="stHeader"] {
-    background: transparent !important;
-}
-
-[data-testid="stToolbar"] {
-    display: none !important;
-}
-
-/* ===== Sidebar RESTORED ===== */
+/* ===== SIDEBAR ===== */
 section[data-testid="stSidebar"] {
     background-color: #DCEFE8 !important;
     border-left: 2px solid #B9DDD2 !important;
     box-shadow: -4px 0 14px rgba(0,0,0,0.06) !important;
 }
 
-section[data-testid="stSidebar"] * {
-    direction: rtl !important;
-    text-align: right !important;
-}
-
 .sidebar-title {
     font-size: 20px;
     font-weight: 700;
     color: #134e4a;
-    text-align: center !important;
+    text-align: center;
     margin-top: 10px;
     margin-bottom: 4px;
 }
@@ -71,11 +51,11 @@ section[data-testid="stSidebar"] * {
 .sidebar-subtitle {
     font-size: 12px;
     color: #4b5563;
-    text-align: center !important;
+    text-align: center;
     margin-bottom: 20px;
 }
 
-/* ===== Hero ===== */
+/* ===== HERO ===== */
 .hero-box {
     background: #0f766e;
     border-radius: 18px;
@@ -90,7 +70,6 @@ section[data-testid="stSidebar"] * {
     color: white;
     margin-bottom: 6px;
     text-align: right;
-    direction: rtl;
 }
 
 .main-subtitle {
@@ -98,16 +77,9 @@ section[data-testid="stSidebar"] * {
     color: #dff7f3;
     margin-bottom: 0;
     text-align: right;
-    direction: rtl;
 }
 
-/* ===== Text helpers ===== */
-label, p, h1, h2, h3, h4, h5, h6 {
-    text-align: right;
-    direction: rtl;
-}
-
-/* ===== Section titles ===== */
+/* ===== TITLES ===== */
 .section-title {
     font-size: 20px;
     font-weight: 700;
@@ -115,17 +87,16 @@ label, p, h1, h2, h3, h4, h5, h6 {
     margin-bottom: 14px;
     margin-top: 8px;
     text-align: right;
-    direction: rtl;
 }
 
-/* ===== Cards ===== */
+/* ===== CARDS ===== */
 .info-card {
     background-color: #f8fafc;
     border: 1px solid #cbd5e1;
     border-radius: 14px;
     padding: 18px;
     text-align: right;
-    direction: rtl;
+    line-height: 1.8;
 }
 
 .success-card {
@@ -137,15 +108,9 @@ label, p, h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     margin-bottom: 10px;
     text-align: right;
-    direction: rtl;
 }
 
-/* ===== File uploader ===== */
-section[data-testid="stFileUploader"] {
-    direction: rtl !important;
-    text-align: right !important;
-}
-
+/* ===== INPUTS ===== */
 div[data-testid="stFileUploader"] section {
     background: #ffffff;
     border-radius: 14px;
@@ -153,7 +118,6 @@ div[data-testid="stFileUploader"] section {
     padding: 10px;
 }
 
-/* ===== Select boxes ===== */
 div[data-baseweb="select"] > div {
     background-color: #ffffff !important;
     border: 2px solid #0f766e !important;
@@ -162,19 +126,7 @@ div[data-baseweb="select"] > div {
     box-shadow: none !important;
 }
 
-div[data-baseweb="select"],
-div[data-baseweb="select"] * {
-    direction: rtl !important;
-    text-align: right !important;
-}
-
-/* ===== Radio ===== */
-.stRadio {
-    direction: rtl;
-    text-align: right;
-}
-
-/* ===== Buttons ===== */
+/* ===== BUTTONS ===== */
 .stButton > button,
 .stDownloadButton > button {
     width: 100%;
@@ -193,7 +145,7 @@ div[data-baseweb="select"] * {
     color: white;
 }
 
-/* ===== Footer ===== */
+/* ===== FOOTER ===== */
 .footer-note {
     text-align: center;
     color: #64748b;
@@ -237,8 +189,8 @@ if page == "إنشاء الإجراء":
     </div>
     """, unsafe_allow_html=True)
 
-    # Left column: status/info | Right column: form
-    col_info, col_form = st.columns([0.85, 1.15], gap="large")
+    # Right side = form, left side = info
+    col_info, col_form = st.columns([0.9, 1.1], gap="large")
 
     with col_form:
         st.markdown('<div class="section-title">رفع بيانات الإجراء</div>', unsafe_allow_html=True)
