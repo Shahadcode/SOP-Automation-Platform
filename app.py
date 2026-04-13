@@ -1,5 +1,59 @@
 import os
 import streamlit as st
+# ===== CLEAN PROFESSIONAL UI =====
+st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+
+hide_streamlit_style = """
+<style>
+
+/* ===== REMOVE TOP BAR ===== */
+header {visibility: hidden;}
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+
+/* ===== REMOVE DEPLOY BAR (share/github) ===== */
+[data-testid="stToolbar"] {
+    display: none;
+}
+
+/* ===== REMOVE COLLAPSE BUTTON ===== */
+[data-testid="collapsedControl"] {
+    display: none !important;
+}
+
+/* ===== FORCE SIDEBAR ALWAYS VISIBLE ===== */
+section[data-testid="stSidebar"] {
+    display: block !important;
+    min-width: 260px;
+    max-width: 260px;
+}
+
+/* ===== REMOVE EXTRA TOP SPACE ===== */
+.block-container {
+    padding-top: 0rem;
+}
+
+/* ===== FIX RTL ALIGNMENT ===== */
+html, body, [class*="css"] {
+    direction: rtl;
+    text-align: right;
+}
+
+/* ===== FIX CENTER SPLIT ISSUE ===== */
+.main {
+    direction: rtl;
+}
+
+/* ===== MAKE PAGE FULL WIDTH CLEAN ===== */
+section.main > div {
+    max-width: 100%;
+    padding-top: 0rem;
+}
+
+</style>
+"""
+
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 from docx import Document
 from sop_engine import generate_sop_data
 from doc_generator import create_sop_doc_from_template
