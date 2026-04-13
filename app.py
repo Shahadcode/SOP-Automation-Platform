@@ -27,13 +27,30 @@ st.markdown("""
 }
 
 /* ===== Hide only safe Streamlit chrome ===== */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
 header[data-testid="stHeader"] {
     background: transparent !important;
 }
+
 [data-testid="stToolbar"] {
     display: none !important;
+}
+
+/* ===== Arabic layout helpers ===== */
+section.main {
+    direction: rtl;
+}
+
+label, p, h1, h2, h3, h4, h5, h6 {
+    direction: rtl;
+    text-align: right;
 }
 
 /* ===== Sidebar ===== */
@@ -126,6 +143,11 @@ div[data-testid="stFileUploader"] section {
     padding: 10px;
 }
 
+section[data-testid="stFileUploader"] {
+    direction: rtl;
+    text-align: right;
+}
+
 /* ===== Select boxes ===== */
 div[data-baseweb="select"] > div {
     background-color: #ffffff !important;
@@ -133,6 +155,26 @@ div[data-baseweb="select"] > div {
     border-radius: 12px !important;
     min-height: 46px !important;
     box-shadow: none !important;
+}
+
+div[data-baseweb="select"],
+div[data-baseweb="select"] * {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* ===== Radio ===== */
+.stRadio {
+    direction: rtl;
+    text-align: right;
+}
+
+/* ===== Info/Success native blocks ===== */
+[data-testid="stInfo"],
+[data-testid="stSuccess"],
+[data-testid="stAlert"] {
+    direction: rtl;
+    text-align: right;
 }
 
 /* ===== Buttons ===== */
@@ -198,7 +240,8 @@ if page == "إنشاء الإجراء":
     </div>
     """, unsafe_allow_html=True)
 
-    col_form, col_info = st.columns([1.15, 0.85], gap="large")
+    # Arabic-friendly order: info left, form right
+    col_info, col_form = st.columns([0.85, 1.15], gap="large")
 
     with col_form:
         st.markdown('<div class="section-title">رفع بيانات الإجراء</div>', unsafe_allow_html=True)
@@ -288,10 +331,16 @@ elif page == "معلومات النظام":
 
     with c1:
         st.markdown('<div class="section-title">ماذا تقوم به المنصة؟</div>', unsafe_allow_html=True)
-        st.markdown('<div class="info-card">تقوم المنصة بتحويل الإجراءات المكتوبة إلى نموذج SOP رسمي باللغة العربية وبنفس الصيغة المعتمدة داخل البنك.<br><br>كما تقوم بتنسيق المحتوى داخل القالب المحدد، بما يشمل المقدمة، الأنظمة المشاركة، الهدف، منطق المطابقة، وخطوات الإجراء.</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="info-card">تقوم المنصة بتحويل الإجراءات المكتوبة إلى نموذج SOP رسمي باللغة العربية وبنفس الصيغة المعتمدة داخل البنك.<br><br>كما تقوم بتنسيق المحتوى داخل القالب المحدد، بما يشمل المقدمة، الأنظمة المشاركة، الهدف، منطق المطابقة، وخطوات الإجراء.</div>',
+            unsafe_allow_html=True,
+        )
 
     with c2:
         st.markdown('<div class="section-title">كيفية الاستخدام</div>', unsafe_allow_html=True)
-        st.markdown('<div class="info-card">1. قم برفع ملف الإجراء.<br>2. اختر القسم.<br>3. اختر وضع العمل المناسب.<br>4. اضغط على زر إنشاء الإجراء.<br>5. قم بتحميل ملف الـ SOP الجاهز.</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="info-card">1. قم برفع ملف الإجراء.<br>2. اختر القسم.<br>3. اختر وضع العمل المناسب.<br>4. اضغط على زر إنشاء الإجراء.<br>5. قم بتحميل ملف الـ SOP الجاهز.</div>',
+            unsafe_allow_html=True,
+        )
 
 st.markdown('<div class="footer-note">Internal Use Only - SOP Automation Platform</div>', unsafe_allow_html=True)
