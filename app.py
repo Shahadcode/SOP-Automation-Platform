@@ -1,263 +1,185 @@
-import os
 import streamlit as st
-from docx import Document
+import os
 from sop_engine import generate_sop_data
 from doc_generator import create_sop_doc_from_template
 
+# =============================
+# PAGE CONFIG
+# =============================
 st.set_page_config(
     page_title="منصة أتمتة الإجراءات",
-    page_icon="🏦",
-    layout="wide",
-    initial_sidebar_state="expanded",
+    layout="wide"
 )
 
-# ================== CSS (FINAL CLEAN) ==================
+# =============================
+# GLOBAL CSS (RTL FIX + DESIGN)
+# =============================
 st.markdown("""
 <style>
 
-/* ===== Base ===== */
-.stApp {
-    background-color: #EAF5F2;
+/* ===== RTL FIX ===== */
+html, body, .stApp {
+    direction: rtl;
+    text-align: right;
 }
 
-/* Remove Streamlit junk */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
-
-/* ===== Sidebar ===== */
-section[data-testid="stSidebar"] {
-    background-color: #DCEFE8;
+/* ===== MAIN CONTAINER ===== */
+.block-container {
+    padding-top: 2rem;
 }
 
-/* ===== Header ===== */
-.hero {
-    background: #0f766e;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.hero-title {
+/* ===== HEADER ===== */
+.header {
+    background: #1f7a6f;
+    padding: 25px 30px;
+    border-radius: 20px;
     color: white;
+    position: relative;
+}
+
+.header h1 {
+    margin: 0;
     font-size: 28px;
-    font-weight: 800;
-    text-align: right;
-    direction: rtl;
 }
 
-.hero-sub {
-    color: #dff7f3;
+.header p {
+    margin-top: 5px;
     font-size: 14px;
-    text-align: right;
-    direction: rtl;
+    opacity: 0.9;
 }
 
-/* ===== Text ===== */
-.rtl {
-    direction: rtl;
-    text-align: right;
+/* ===== LOGO ===== */
+.header img {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    height: 50px;
 }
 
-/* ===== Inputs ===== */
-div[data-baseweb="select"] > div {
-    border-radius: 10px !important;
-    border: 2px solid #0f766e !important;
+/* ===== CARDS ===== */
+.card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #e6e6e6;
 }
 
-div[data-baseweb="select"] span {
+/* ===== INPUT ALIGNMENT ===== */
+.stSelectbox, .stRadio, .stFileUploader {
     direction: rtl !important;
     text-align: right !important;
 }
 
-/* ===== Radio FIX ===== */
+/* ===== RADIO FIX (IMPORTANT) ===== */
 div[data-testid="stRadio"] {
-    direction: rtl;
+    direction: rtl !important;
 }
 
 div[data-testid="stRadio"] label {
     display: flex !important;
     flex-direction: row-reverse !important;
-    justify-content: flex-end !important;
-    gap: 8px;
-    width: 100%;
-}
-
-div[data-testid="stRadio"] p {
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 10px;
     text-align: right !important;
     width: 100%;
 }
 
-/* ===== Buttons ===== */
+/* ===== BUTTON ===== */
 .stButton button {
-    background: #0f766e;
+    background: #1f7a6f;
     color: white;
     border-radius: 10px;
-    height: 45px;
-    font-weight: bold;
-}
-
-/* ===== Cards ===== */
-.card {
-    background: #f8fafc;
-    padding: 16px;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    direction: rtl;
-    text-align: right;
-}
-
-.success {
-    background: #ecfdf5;
-    border: 1px solid #a7f3d0;
-    padding: 10px;
-    border-radius: 10px;
-    direction: rtl;
-    text-align: right;
-}
-
-/* Footer */
-.footer {
-    text-align: center;
-    color: #777;
-    font-size: 12px;
-    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ================== Helpers ==================
-def read_uploaded_file(uploaded_file):
-    if uploaded_file.name.endswith(".txt"):
-        return uploaded_file.read().decode("utf-8")
+# =============================
+# HEADER
+# =============================
+st.markdown(f"""
+<div class="header">
+    <h1>منصة أتمتة الإجراءات</h1>
+    <p>تحويل الإجراءات المكتوبة إلى نموذج SOP رسمي بنفس الصيغة المعتمدة في البنك</p>
+    <img src="assets/logo.png">
+</div>
+""", unsafe_allow_html=True)
 
-    if uploaded_file.name.endswith(".docx"):
-        doc = Document(uploaded_file)
-        return "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
+st.markdown("<br>", unsafe_allow_html=True)
 
-    return None
+# =============================
+# LAYOUT
+# =============================
+col1, col2 = st.columns([2, 1])
 
+# =============================
+# RIGHT SIDE (UPLOAD & FORM)
+# =============================
+with col1:
+    st.markdown("### رفع بيانات الإجراء")
 
-# ================== Sidebar ==================
-with st.sidebar:
-    if os.path.exists("assets/logo.png"):
-        st.image("assets/logo.png", width=150)
+    uploaded_file = st.file_uploader("رفع الإجراء", type=["txt", "docx"])
 
-    st.markdown("<div class='rtl'><b>التنقل</b></div>", unsafe_allow_html=True)
+    department = st.selectbox("القسم", ["المالية", "العمليات", "تقنية المعلومات"])
 
-    page = st.radio("", ["إنشاء الإجراء", "معلومات النظام"])
+    language = st.selectbox("اللغة", ["العربية"])
 
+    st.markdown("### وضع العمل")
 
-# ================== Header ==================
-def header(title, subtitle):
-    c1, c2 = st.columns([6,1])
+    mode = st.radio(
+        "",
+        ["استخراج مباشر من النص", "إعادة صياغة احترافية"],
+        label_visibility="collapsed"
+    )
 
-    with c1:
-        st.markdown(f"""
-        <div class="hero">
-            <div class="hero-title">{title}</div>
-            <div class="hero-sub">{subtitle}</div>
-        </div>
-        """, unsafe_allow_html=True)
+    st.info("سيتم الاعتماد على نص المستند المرفوع كما هو قدر الإمكان، مع أقل قدر ممكن من الاختصار أو إعادة الصياغة.")
 
-    with c2:
-        if os.path.exists("assets/logo.png"):
-            st.image("assets/logo.png", width=110)
+    if st.button("إنشاء الإجراء"):
 
-
-# ================== PAGE 1 ==================
-if page == "إنشاء الإجراء":
-
-    header("منصة أتمتة الإجراءات",
-           "تحويل الإجراءات المكتوبة إلى نموذج SOP رسمي")
-
-    col_left, col_right = st.columns([1,1.2])
-
-    # ===== RIGHT (FORM) =====
-    with col_right:
-
-        st.markdown("<div class='rtl'><b>رفع بيانات الإجراء</b></div>", unsafe_allow_html=True)
-
-        st.markdown("<div class='rtl'>رفع الإجراء</div>", unsafe_allow_html=True)
-        uploaded_file = st.file_uploader("", type=["txt","docx"])
-
-        st.markdown("<div class='rtl'>القسم</div>", unsafe_allow_html=True)
-        department = st.selectbox("", ["المالية","العمليات","الامتثال"])
-
-        st.markdown("<div class='rtl'>اللغة</div>", unsafe_allow_html=True)
-        language = st.selectbox("", ["العربية"])
-
-        st.markdown("<div class='rtl'>وضع العمل</div>", unsafe_allow_html=True)
-
-        mode = st.radio(
-            "",
-            ["استخراج مباشر من النص", "إعادة صياغة احترافية"]
-        )
-
-        mode_value = "extract" if mode == "استخراج مباشر من النص" else "rewrite"
-
-        generate = st.button("إنشاء الإجراء")
-
-    # ===== LEFT (INFO) =====
-    with col_left:
-
-        st.markdown("<div class='rtl'><b>الحالة والتعليمات</b></div>", unsafe_allow_html=True)
-
-        if uploaded_file:
-            st.markdown("<div class='success'>تم رفع الملف بنجاح</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='card'>اسم الملف: {uploaded_file.name}</div>", unsafe_allow_html=True)
-        else:
-            st.markdown("<div class='card'>يرجى رفع ملف</div>", unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class='card'>
-        <b>ملاحظات:</b><br>
-        • يدعم TXT و Word<br>
-        • يتم إنشاء SOP عربي<br>
-        • نفس قالب البنك
-        </div>
-        """, unsafe_allow_html=True)
-
-    # ===== PROCESS =====
-    if uploaded_file and generate:
-        text = read_uploaded_file(uploaded_file)
-
-        if text:
+        if uploaded_file is not None:
             try:
-                data = generate_sop_data(
-                    text=text,
-                    department=department,
-                    language=language,
-                    mode=mode_value
-                )
+                text = uploaded_file.read().decode("utf-8", errors="ignore")
 
-                file_path = create_sop_doc_from_template(data)
+                sop_data = generate_sop_data(text, department)
 
-                st.success("تم إنشاء الملف")
+                output_file = create_sop_doc_from_template(sop_data)
 
-                with open(file_path, "rb") as f:
+                with open(output_file, "rb") as file:
                     st.download_button(
-                        "تحميل",
-                        f,
-                        file_name="SOP.docx"
+                        "تحميل الملف",
+                        file,
+                        file_name=os.path.basename(output_file)
                     )
 
+                st.success("تم إنشاء الملف بنجاح")
+
             except Exception as e:
-                st.error(str(e))
+                st.error(f"حدث خطأ: {str(e)}")
 
+        else:
+            st.warning("يرجى رفع ملف أولاً")
 
-# ================== PAGE 2 ==================
-else:
+# =============================
+# LEFT SIDE (INFO)
+# =============================
+with col2:
+    st.markdown("### الحالة والتعليمات")
 
-    header("معلومات النظام","شرح النظام")
+    st.info("يرجى رفع ملف Word أو TXT للبدء.")
 
     st.markdown("""
-    <div class='card'>
-    هذه المنصة تقوم بتحويل الإجراءات إلى SOP.
-    </div>
-    """, unsafe_allow_html=True)
+    ### ملاحظات مهمة:
+    - يدعم النظام ملفات TXT و Word
+    - يتم إنشاء الإجراء باللغة العربية الرسمية
+    - يتم إخراج النتيجة بنفس نموذج SOP المعتمد
+    - يفضل أن يكون النص واضحاً ومكتوباً بشكل منظم
+    """)
 
-
-# ================== FOOTER ==================
-st.markdown("<div class='footer'>Internal Use Only</div>", unsafe_allow_html=True)
+# =============================
+# FOOTER
+# =============================
+st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("Internal Use Only - SOP Automation Platform")
