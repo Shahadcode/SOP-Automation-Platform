@@ -13,6 +13,7 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+/* ===== Base ===== */
 .stApp {
     background-color: #EAF5F2;
 }
@@ -25,12 +26,13 @@ st.markdown("""
     max-width: 100% !important;
 }
 
+/* ===== Hide Streamlit chrome ===== */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header[data-testid="stHeader"] {background: transparent !important;}
 [data-testid="stToolbar"] {display: none !important;}
 
-/* Sidebar */
+/* ===== Sidebar ===== */
 section[data-testid="stSidebar"] {
     background-color: #DCEFE8 !important;
     border-left: 2px solid #B9DDD2 !important;
@@ -53,11 +55,11 @@ section[data-testid="stSidebar"] {
     margin-bottom: 20px;
 }
 
-/* Header */
+/* ===== Header ===== */
 .hero-box {
     background: #0f766e;
     border-radius: 18px;
-    padding: 18px 24px;
+    padding: 22px 24px;
     margin-bottom: 18px;
     box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
 }
@@ -69,6 +71,7 @@ section[data-testid="stSidebar"] {
     margin-bottom: 8px;
     text-align: right;
     direction: rtl;
+    line-height: 1.2;
 }
 
 .hero-subtitle {
@@ -77,15 +80,11 @@ section[data-testid="stSidebar"] {
     margin-bottom: 0;
     text-align: right;
     direction: rtl;
+    line-height: 1.6;
 }
 
-/* Text */
-div[data-testid="stMarkdownContainer"] * {
-    text-align: right !important;
-    direction: rtl !important;
-}
-
-.custom-label {
+/* ===== Text blocks ===== */
+.rtl-title {
     font-size: 20px;
     font-weight: 700;
     color: #134e4a;
@@ -95,17 +94,16 @@ div[data-testid="stMarkdownContainer"] * {
     direction: rtl;
 }
 
-.field-label {
+.rtl-label {
     font-size: 15px;
     font-weight: 600;
     color: #134e4a;
     margin-bottom: 6px;
-    margin-top: 10px;
+    margin-top: 12px;
     text-align: right;
     direction: rtl;
 }
 
-/* Cards */
 .info-card {
     background-color: #f8fafc;
     border: 1px solid #cbd5e1;
@@ -128,7 +126,15 @@ div[data-testid="stMarkdownContainer"] * {
     direction: rtl;
 }
 
-/* Inputs */
+/* ===== Markdown text alignment ===== */
+div[data-testid="stMarkdownContainer"] p,
+div[data-testid="stMarkdownContainer"] li,
+div[data-testid="stMarkdownContainer"] strong {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+/* ===== File uploader ===== */
 div[data-testid="stFileUploader"] section {
     background: #ffffff;
     border-radius: 14px;
@@ -136,6 +142,12 @@ div[data-testid="stFileUploader"] section {
     padding: 10px;
 }
 
+div[data-testid="stFileUploader"] * {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* ===== Select boxes ===== */
 div[data-baseweb="select"] > div {
     background-color: #ffffff !important;
     border: 2px solid #0f766e !important;
@@ -145,26 +157,39 @@ div[data-baseweb="select"] > div {
 }
 
 div[data-baseweb="select"] span,
-div[data-baseweb="select"] input {
+div[data-baseweb="select"] input,
+div[data-baseweb="select"] svg {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* ===== Radio buttons ===== */
+div[data-testid="stRadio"] {
+    direction: rtl !important;
+}
+
+div[data-testid="stRadio"] label {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    width: 100% !important;
+}
+
+div[data-testid="stRadio"] p {
     text-align: right !important;
     direction: rtl !important;
+    width: 100% !important;
+    margin: 0 !important;
 }
 
-.stRadio [role="radiogroup"] {
-    direction: rtl !important;
-}
-
-.stRadio [data-testid="stMarkdownContainer"] p {
-    text-align: right !important;
-    direction: rtl !important;
-}
-
+/* ===== Alerts ===== */
 [data-testid="stAlert"] {
     direction: rtl !important;
     text-align: right !important;
 }
 
-/* Buttons */
+/* ===== Buttons ===== */
 .stButton > button,
 .stDownloadButton > button {
     width: 100%;
@@ -183,7 +208,7 @@ div[data-baseweb="select"] input {
     color: white;
 }
 
-/* Footer */
+/* ===== Footer ===== */
 .footer-note {
     text-align: center;
     color: #64748b;
@@ -219,49 +244,56 @@ with st.sidebar:
     page = st.radio("التنقل", ["إنشاء الإجراء", "معلومات النظام"])
 
 
-if page == "إنشاء الإجراء":
-    # Header with native Streamlit columns
-    h_text, h_logo = st.columns([6, 1], gap="small")
-
-    with h_text:
-        st.markdown("""
-        <div class="hero-box">
-            <div class="hero-title">منصة أتمتة الإجراءات</div>
-            <div class="hero-subtitle">تحويل الإجراءات المكتوبة إلى نموذج SOP رسمي بنفس الصيغة المعتمدة في البنك.</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with h_logo:
+def render_header(title: str, subtitle: str):
+    c_text, c_logo = st.columns([6, 1], gap="small")
+    with c_text:
+        st.markdown(
+            f"""
+            <div class="hero-box">
+                <div class="hero-title">{title}</div>
+                <div class="hero-subtitle">{subtitle}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with c_logo:
         if os.path.exists("assets/logo.png"):
             st.image("assets/logo.png", width=120)
+
+
+if page == "إنشاء الإجراء":
+    render_header(
+        "منصة أتمتة الإجراءات",
+        "تحويل الإجراءات المكتوبة إلى نموذج SOP رسمي بنفس الصيغة المعتمدة في البنك."
+    )
 
     col_info, col_form = st.columns([0.9, 1.1], gap="large")
 
     with col_form:
-        st.markdown('<div class="custom-label">رفع بيانات الإجراء</div>', unsafe_allow_html=True)
+        st.markdown('<div class="rtl-title">رفع بيانات الإجراء</div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="field-label">رفع الإجراء</div>', unsafe_allow_html=True)
+        st.markdown('<div class="rtl-label">رفع الإجراء</div>', unsafe_allow_html=True)
         uploaded_file = st.file_uploader(
             "رفع الإجراء",
             type=["txt", "docx"],
             label_visibility="collapsed",
         )
 
-        st.markdown('<div class="field-label">القسم</div>', unsafe_allow_html=True)
+        st.markdown('<div class="rtl-label">القسم</div>', unsafe_allow_html=True)
         department = st.selectbox(
             "القسم",
             ["المالية", "العمليات", "الامتثال", "إدارة المخاطر", "التدقيق الداخلي", "أخرى"],
             label_visibility="collapsed",
         )
 
-        st.markdown('<div class="field-label">اللغة</div>', unsafe_allow_html=True)
+        st.markdown('<div class="rtl-label">اللغة</div>', unsafe_allow_html=True)
         language = st.selectbox(
             "اللغة",
             ["العربية"],
             label_visibility="collapsed",
         )
 
-        st.markdown('<div class="field-label">وضع العمل</div>', unsafe_allow_html=True)
+        st.markdown('<div class="rtl-label">وضع العمل</div>', unsafe_allow_html=True)
         mode = st.radio(
             "وضع العمل",
             ["استخراج مباشر من النص", "إعادة صياغة احترافية"],
@@ -278,7 +310,7 @@ if page == "إنشاء الإجراء":
         generate_btn = st.button("إنشاء الإجراء")
 
     with col_info:
-        st.markdown('<div class="custom-label">الحالة والتعليمات</div>', unsafe_allow_html=True)
+        st.markdown('<div class="rtl-title">الحالة والتعليمات</div>', unsafe_allow_html=True)
 
         if uploaded_file:
             st.markdown('<div class="success-card">تم رفع الملف بنجاح.</div>', unsafe_allow_html=True)
@@ -328,31 +360,22 @@ if page == "إنشاء الإجراء":
             st.error("تعذر قراءة الملف المرفوع.")
 
 elif page == "معلومات النظام":
-    h_text, h_logo = st.columns([6, 1], gap="small")
-
-    with h_text:
-        st.markdown("""
-        <div class="hero-box">
-            <div class="hero-title">معلومات النظام</div>
-            <div class="hero-subtitle">نظرة عامة على وظيفة المنصة وآلية الاستخدام.</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with h_logo:
-        if os.path.exists("assets/logo.png"):
-            st.image("assets/logo.png", width=120)
+    render_header(
+        "معلومات النظام",
+        "نظرة عامة على وظيفة المنصة وآلية الاستخدام."
+    )
 
     c1, c2 = st.columns(2, gap="large")
 
     with c1:
-        st.markdown('<div class="custom-label">ماذا تقوم به المنصة؟</div>', unsafe_allow_html=True)
+        st.markdown('<div class="rtl-title">ماذا تقوم به المنصة؟</div>', unsafe_allow_html=True)
         st.markdown(
             '<div class="info-card">تقوم المنصة بتحويل الإجراءات المكتوبة إلى نموذج SOP رسمي باللغة العربية وبنفس الصيغة المعتمدة داخل البنك.<br><br>كما تقوم بتنسيق المحتوى داخل القالب المحدد، بما يشمل المقدمة، الأنظمة المشاركة، الهدف، منطق المطابقة، وخطوات الإجراء.</div>',
             unsafe_allow_html=True,
         )
 
     with c2:
-        st.markdown('<div class="custom-label">كيفية الاستخدام</div>', unsafe_allow_html=True)
+        st.markdown('<div class="rtl-title">كيفية الاستخدام</div>', unsafe_allow_html=True)
         st.markdown(
             '<div class="info-card">1. قم برفع ملف الإجراء.<br>2. اختر القسم.<br>3. اختر وضع العمل المناسب.<br>4. اضغط على زر إنشاء الإجراء.<br>5. قم بتحميل ملف الـ SOP الجاهز.</div>',
             unsafe_allow_html=True,
