@@ -13,7 +13,7 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* ===== SAFE BASE ONLY ===== */
+/* ===== Base ===== */
 .stApp {
     background-color: #EAF5F2;
 }
@@ -32,7 +32,7 @@ footer {visibility: hidden;}
 header[data-testid="stHeader"] {background: transparent !important;}
 [data-testid="stToolbar"] {display: none !important;}
 
-/* ===== SIDEBAR ===== */
+/* ===== Sidebar ===== */
 section[data-testid="stSidebar"] {
     background-color: #DCEFE8 !important;
     border-left: 2px solid #B9DDD2 !important;
@@ -55,13 +55,32 @@ section[data-testid="stSidebar"] {
     margin-bottom: 20px;
 }
 
-/* ===== HERO ===== */
+/* ===== Header ===== */
 .hero-box {
     background: #0f766e;
     border-radius: 18px;
-    padding: 22px 24px;
+    padding: 18px 24px;
     margin-bottom: 18px;
     box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
+}
+
+.header-flex {
+    display: flex;
+    flex-direction: row-reverse; /* logo on right */
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.header-logo img {
+    max-height: 72px;
+    object-fit: contain;
+}
+
+.header-text {
+    flex: 1;
+    text-align: right;
+    direction: rtl;
 }
 
 .main-title {
@@ -70,6 +89,7 @@ section[data-testid="stSidebar"] {
     color: white;
     margin-bottom: 6px;
     text-align: right;
+    direction: rtl;
 }
 
 .main-subtitle {
@@ -77,9 +97,23 @@ section[data-testid="stSidebar"] {
     color: #dff7f3;
     margin-bottom: 0;
     text-align: right;
+    direction: rtl;
 }
 
-/* ===== TITLES ===== */
+/* ===== Text alignment ===== */
+label, p, h1, h2, h3, h4, h5, h6, li {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+/* native markdown + text */
+[data-testid="stMarkdownContainer"],
+[data-testid="stText"] {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+/* ===== Section titles ===== */
 .section-title {
     font-size: 20px;
     font-weight: 700;
@@ -87,16 +121,18 @@ section[data-testid="stSidebar"] {
     margin-bottom: 14px;
     margin-top: 8px;
     text-align: right;
+    direction: rtl;
 }
 
-/* ===== CARDS ===== */
+/* ===== Cards ===== */
 .info-card {
     background-color: #f8fafc;
     border: 1px solid #cbd5e1;
     border-radius: 14px;
     padding: 18px;
     text-align: right;
-    line-height: 1.8;
+    direction: rtl;
+    line-height: 1.9;
 }
 
 .success-card {
@@ -108,9 +144,10 @@ section[data-testid="stSidebar"] {
     font-weight: 600;
     margin-bottom: 10px;
     text-align: right;
+    direction: rtl;
 }
 
-/* ===== INPUTS ===== */
+/* ===== Inputs ===== */
 div[data-testid="stFileUploader"] section {
     background: #ffffff;
     border-radius: 14px;
@@ -126,7 +163,26 @@ div[data-baseweb="select"] > div {
     box-shadow: none !important;
 }
 
-/* ===== BUTTONS ===== */
+/* align select text right */
+div[data-baseweb="select"] span,
+div[data-baseweb="select"] input {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+/* radio */
+.stRadio > div {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* info/success/error blocks */
+[data-testid="stAlert"] {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* ===== Buttons ===== */
 .stButton > button,
 .stDownloadButton > button {
     width: 100%;
@@ -145,7 +201,7 @@ div[data-baseweb="select"] > div {
     color: white;
 }
 
-/* ===== FOOTER ===== */
+/* ===== Footer ===== */
 .footer-note {
     text-align: center;
     color: #64748b;
@@ -182,14 +238,28 @@ with st.sidebar:
 
 
 if page == "إنشاء الإجراء":
-    st.markdown("""
+    header_logo_html = ""
+    if os.path.exists("assets/logo.png"):
+        header_logo_html = '<div class="header-logo"><img src="app/static/logo.png" alt="logo"></div>'
+
+    st.markdown(f"""
     <div class="hero-box">
-        <div class="main-title">منصة أتمتة الإجراءات</div>
-        <div class="main-subtitle">تحويل الإجراءات المكتوبة إلى نموذج SOP رسمي بنفس الصيغة المعتمدة في البنك.</div>
+        <div class="header-flex">
+            {header_logo_html}
+            <div class="header-text">
+                <div class="main-title">منصة أتمتة الإجراءات</div>
+                <div class="main-subtitle">تحويل الإجراءات المكتوبة إلى نموذج SOP رسمي بنفس الصيغة المعتمدة في البنك.</div>
+            </div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Right side = form, left side = info
+    # fallback native image in case html path doesn't render on cloud
+    if os.path.exists("assets/logo.png"):
+        col_h1, col_h2 = st.columns([8, 1])
+        with col_h2:
+            st.image("assets/logo.png", width=90)
+
     col_info, col_form = st.columns([0.9, 1.1], gap="large")
 
     with col_form:
