@@ -14,6 +14,10 @@ st.set_page_config(
 st.markdown("""
 <style>
 /* ===== Base ===== */
+html, body {
+    direction: rtl;
+}
+
 .stApp {
     background-color: #EAF5F2;
 }
@@ -43,28 +47,23 @@ header[data-testid="stHeader"] {
     display: none !important;
 }
 
-/* ===== Arabic layout helpers ===== */
-section.main {
-    direction: rtl;
-}
-
-label, p, h1, h2, h3, h4, h5, h6 {
-    direction: rtl;
-    text-align: right;
-}
-
-/* ===== Sidebar ===== */
+/* ===== Sidebar RESTORED ===== */
 section[data-testid="stSidebar"] {
     background-color: #DCEFE8 !important;
     border-left: 2px solid #B9DDD2 !important;
     box-shadow: -4px 0 14px rgba(0,0,0,0.06) !important;
 }
 
+section[data-testid="stSidebar"] * {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
 .sidebar-title {
     font-size: 20px;
     font-weight: 700;
     color: #134e4a;
-    text-align: center;
+    text-align: center !important;
     margin-top: 10px;
     margin-bottom: 4px;
 }
@@ -72,7 +71,7 @@ section[data-testid="stSidebar"] {
 .sidebar-subtitle {
     font-size: 12px;
     color: #4b5563;
-    text-align: center;
+    text-align: center !important;
     margin-bottom: 20px;
 }
 
@@ -98,6 +97,12 @@ section[data-testid="stSidebar"] {
     font-size: 15px;
     color: #dff7f3;
     margin-bottom: 0;
+    text-align: right;
+    direction: rtl;
+}
+
+/* ===== Text helpers ===== */
+label, p, h1, h2, h3, h4, h5, h6 {
     text-align: right;
     direction: rtl;
 }
@@ -136,16 +141,16 @@ section[data-testid="stSidebar"] {
 }
 
 /* ===== File uploader ===== */
+section[data-testid="stFileUploader"] {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
 div[data-testid="stFileUploader"] section {
     background: #ffffff;
     border-radius: 14px;
     border: 2px dashed #0f766e;
     padding: 10px;
-}
-
-section[data-testid="stFileUploader"] {
-    direction: rtl;
-    text-align: right;
 }
 
 /* ===== Select boxes ===== */
@@ -165,14 +170,6 @@ div[data-baseweb="select"] * {
 
 /* ===== Radio ===== */
 .stRadio {
-    direction: rtl;
-    text-align: right;
-}
-
-/* ===== Info/Success native blocks ===== */
-[data-testid="stInfo"],
-[data-testid="stSuccess"],
-[data-testid="stAlert"] {
     direction: rtl;
     text-align: right;
 }
@@ -240,7 +237,7 @@ if page == "إنشاء الإجراء":
     </div>
     """, unsafe_allow_html=True)
 
-    # Arabic-friendly order: info left, form right
+    # Left column: status/info | Right column: form
     col_info, col_form = st.columns([0.85, 1.15], gap="large")
 
     with col_form:
