@@ -3,7 +3,21 @@ import os
 from openai import OpenAI
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-def generate_sop_data(text, department, language="Arabic"):
+
+def generate_sop_data(text, department, language="Arabic", mode="extract"):
+    mode_instruction = ""
+    if mode == "rewrite":
+        mode_instruction = """
+- المطلوب هو إعادة صياغة المحتوى بشكل مهني ورسمي ومحسن.
+- يمكن تحسين الأسلوب، الترتيب، والوضوح مع الحفاظ على المعنى.
+"""
+    else:
+        mode_instruction = """
+- المطلوب هو الاستخراج المباشر من النص المرفوع قدر الإمكان.
+- لا تقم بإضافة معلومات غير موجودة إلا عند الضرورة القصوى.
+- إذا كانت بعض البيانات غير موجودة، اتركها فارغة أو بصياغة محدودة جداً.
+"""
+
     prompt = f"""
 أنت خبير محترف في إعداد الإجراءات التشغيلية القياسية في البنوك.
 
@@ -11,6 +25,8 @@ def generate_sop_data(text, department, language="Arabic"):
 يجب أن تكون جميع النتائج باللغة العربية الرسمية المهنية.
 يجب أن يكون الأسلوب مناسباً للاعتماد والتدقيق الداخلي والخارجي.
 لا تكتب أي نص خارج JSON.
+
+{mode_instruction}
 
 أعد النتيجة بهذا الشكل تماماً:
 
@@ -44,18 +60,6 @@ def generate_sop_data(text, department, language="Arabic"):
       "responsibility": "الموظف",
       "procedure": "",
       "tools": ""
-    }},
-    {{
-      "no": "2",
-      "responsibility": "الموظف",
-      "procedure": "",
-      "tools": ""
-    }},
-    {{
-      "no": "3",
-      "responsibility": "الموظف",
-      "procedure": "",
-      "tools": ""
     }}
   ]
 }}
@@ -64,11 +68,11 @@ def generate_sop_data(text, department, language="Arabic"):
 - جميع المخرجات بالعربية فقط.
 - استخدم لغة مصرفية رسمية وواضحة.
 - اجعل "المقدمة" فقرة متكاملة.
-- اجعل "الأنظمة المشاركة" نقاطاً مختصرة وواضحة.
-- اجعل "هدف الاجراء" نقاطاً مهنية.
-- اجعل "منطق المطابقة" شرحاً عملياً واضحاً.
+- اجعل "الأنظمة المشاركة" قائمة JSON من نقاط كاملة.
+- اجعل "هدف الاجراء" قائمة JSON من نقاط كاملة.
+- اجعل "منطق المطابقة" قائمة JSON من النقاط، وليس نصاً واحداً.
+- يجب أن تكون كل نقطة في "منطق المطابقة" جملة كاملة وواضحة.
 - اجعل الخطوات قابلة للتنفيذ.
-- إذا كانت بعض البيانات غير موجودة، اتركها فارغة أو املأها بشكل مهني مناسب.
 - لا تستخدم اللغة الإنجليزية إلا إذا كان اسم نظام أو مصطلحاً ثابتاً.
 
 النص:
@@ -88,11 +92,3 @@ def generate_sop_data(text, department, language="Arabic"):
         content = content.replace("```", "").strip()
 
     return json.loads(content)
-
-
-    response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[{"role": "user", "content": prompt}]
-)
-    
-    return response.choices[0].message.content
